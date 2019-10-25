@@ -129,11 +129,7 @@ namespace ConsoleApp13
 
             var gate = new Gate(1, _options.WorkerCount);
 
-            foreach (var queue in _options.Queues)
-            {
-                processes.Add(new GateTuner(gate, queue, TimeSpan.FromSeconds(5)).UseBackgroundPool(1));
-            }
-
+            processes.Add(new GateTuner(gate, _options.Queues, TimeSpan.FromSeconds(5)).UseBackgroundPool(1));
             processes.Add(new GateWorker(gate, new Worker(_options.Queues, performer, stateChanger)).UseBackgroundPool(_options.WorkerCount));
             processes.Add(new DelayedJobScheduler(_options.SchedulePollingInterval, stateChanger).UseBackgroundPool(1));
             processes.Add(new RecurringJobScheduler(factory, _options.SchedulePollingInterval, timeZoneResolver).UseBackgroundPool(1));

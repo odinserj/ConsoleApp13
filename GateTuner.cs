@@ -15,6 +15,8 @@
 // License along with Hangfire. If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Hangfire.Logging;
 using Hangfire.Server;
 
@@ -24,13 +26,15 @@ namespace ConsoleApp13
     {
         private readonly ILog _logger = LogProvider.GetCurrentClassLogger();
         private readonly Gate _gate;
-        private readonly string _queue;
+        private readonly HashSet<string> _queues;
         private readonly TimeSpan _delay;
+        private readonly string _queueNames;
 
-        public GateTuner(Gate gate, string queue, TimeSpan delay)
+        public GateTuner(Gate gate, string[] queues, TimeSpan delay)
         {
             _gate = gate;
-            _queue = queue;
+            _queues = new HashSet<string>(queues, StringComparer.OrdinalIgnoreCase);
+            _queueNames = String.Join(", ", queues);
             _delay = delay;
         }
 
@@ -41,28 +45,18 @@ namespace ConsoleApp13
 
             _logger.Trace("Checking queue length to decide whether to change gate levels...");
 
-            long? queueLength = null;
-
-            foreach (var queue in queues)
-            {
-                if (queue.Name.Equals(_queue, StringComparison.OrdinalIgnoreCase))
-                {
-                    queueLength = queue.Length;
-                }
-            }
-
-            if (queueLength.HasValue && queueLength.Value > 0)
+            if (queues.Any(queue => _queues.Contains(queue.Name) && queue.Length > 0))
             {
                 if (_gate.TryIncreaseLevel(out var level))
                 {
-                    _logger.Debug($"Gate level for queue '{_queue}' increased to {level} / {_gate.MaxLevel}");
+                    _logger.Debug($"Gate level for queues ({_queueNames}) increased to {level} / {_gate.MaxLevel}");
                 }
             }
             else
             {
                 if (_gate.TryDecreaseLevel(out var level))
                 {
-                    _logger.Debug($"Gate level for queue '{_queue}' decreased to {level} / {_gate.MaxLevel}");
+                    _logger.Debug($"Gate level for queues ({_queueNames}) decreased to {level} / {_gate.MaxLevel}");
                 }
             }
 
