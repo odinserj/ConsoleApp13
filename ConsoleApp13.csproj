@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -9,7 +9,7 @@
     <PackageReference Include="Hangfire.Core" Version="1.7.7" />
     <PackageReference Include="hangfire.sqlserver" Version="1.7.7" />
     <PackageReference Include="microsoft.data.sqlclient" Version="1.0.19269.1" />
-    <PackageReference Include="system.data.sqlclient" Version="4.7.0" />
+    <PackageReference Include="system.data.sqlclient" Version="4.8.5" />
   </ItemGroup>
 
 </Project>
